@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,14 +12,18 @@ public class PlayerController : MonoBehaviour {
   #region Private Members
   private Inventory _inventory;
   private Vector3? _targetPosition;
-  private PickableItem _lootTarget;
+  private float _targetEpsilon;
+  private Action _targetReached;
+
+  private const float DefaultEpsilon = .1f;
   #endregion
 
   #region Unity Callbacks
   // Use this for initialization
   private void Start() {
-    _lootTarget = null;
     _targetPosition = null;
+    _targetReached = null;
+    _targetEpsilon = DefaultEpsilon;
     _inventory = GetComponent<Inventory>();
   }
 
@@ -32,18 +37,21 @@ public class PlayerController : MonoBehaviour {
         Debug.Log(string.Format("Clicked on {0} @{1}m (in interaction distance: {2})", hit.transform.name, distance, distance < InteractingDistance));
 
         PickableItem pickable = hit.collider.GetComponent<PickableItem>();
+        InteractibleItem interactible = hit.collider.GetComponent<InteractibleItem>();
         if (pickable != null) {
-          if (distance < InteractingDistance) {
+          RotateTo(pickable.transform.position);
+          MoveTo(target: pickable.transform.position, reach: InteractingDistance, andThen: () => {
             PickItem(pickable);
-          } else {
-            Debug.Log("Too far to pick item, moving and looting...");
-            RotateTo(pickable.transform.position);
-            MoveAndLoot(pickable);
-          }
+          });
+        } else if (interactible != null) {
+          RotateTo(interactible.transform.position);
+          MoveTo(target: interactible.transform.position, reach: InteractingDistance, andThen: () => {
+            InteractWithItem(interactible);
+          });
         } else {
           Debug.Log("No interaction, moving...");
           RotateTo(hit.point);
-          MoveTo(hit.point);
+          MoveTo(target: hit.point);
         }
       }
     }
@@ -62,14 +70,12 @@ public class PlayerController : MonoBehaviour {
       transform.position = Vector3.MoveTowards(transform.position, _targetPosition.Value, Time.deltaTime * WalkSpeed);
 
       float remainingDistance = (_targetPosition.Value - transform.position).magnitude;
-      if (_lootTarget != null && remainingDistance < InteractingDistance) {
-        PickItem(_lootTarget);
+      if (remainingDistance < _targetEpsilon) {
+        if (_targetReached != null) {
+          _targetReached();
+        }
+        _targetReached = null;
         _targetPosition = null;
-        _lootTarget = null;
-      } else if (remainingDistance < .1f) {
-        transform.position = _targetPosition.Value;
-        _targetPosition = null;
-        _lootTarget = null;
       }
     }
   }
@@ -83,20 +89,33 @@ public class PlayerController : MonoBehaviour {
     }
   }
 
-  private void InteractWithItem() {
+  private void InteractWithItem(InteractibleItem item) {
+    PickableItem pickedItem = _inventory.ReleaseItem();
+    InteractionResult interactionResult = item.Interact(pickedItem);
 
+    switch (interactionResult) {
+      case InteractionResult.Success:
+        GameObject.Destroy(pickedItem);
+        break;
+
+      case InteractionResult.MissingKey:
+        Debug.Log("I need something for that");
+        // TODO: UI to show we are missing the required item to interact
+        break;
+
+      case InteractionResult.InvalidKey:
+        Debug.Log("I can't use this to solve that");
+        // TODO: UI to show we are carrying the wrong item to interact
+        break;
+    }
   }
 
-  private void MoveTo(Vector3 target) {
-    target.y = transform.position.y;
-    _targetPosition = target;
-  }
-
-  private void MoveAndLoot(PickableItem target) {
-    _lootTarget = target;
-    Vector3 targetPosition = target.transform.position;
-    targetPosition.y = transform.position.y;
-    _targetPosition = targetPosition;
+  private void MoveTo(Vector3 target, float reach = DefaultEpsilon, Action andThen = null) {
+    Vector3 targetPos = target;
+    targetPos.y = transform.position.y;
+    _targetPosition = targetPos;
+    _targetEpsilon = reach;
+    _targetReached = andThen;
   }
 
   private void RotateTo(Vector3 target) {

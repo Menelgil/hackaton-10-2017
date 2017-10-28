@@ -26,7 +26,7 @@ public class Inventory : MonoBehaviour {
     return true;
   }
 
-  public PickableItem Release() {
+  public PickableItem ReleaseItem() {
     var item = this._item;
     this._item = null;
     return item;
