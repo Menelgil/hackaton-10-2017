@@ -34,3 +34,7 @@ sysinfo.txt
 *.unitypackage
 /Hackaton2017/Assets/Scenes/dev.unity
 /Hackaton2017/Assets/Scenes/dev.unity.meta
+
+# Vim & unix editors
+*.swp
+*~
