@@ -5,12 +5,14 @@ using UnityEngine;
 public class PickableItem : MonoBehaviour {
   #region Private Members
   private Renderer _renderer;
+  private Collider _collider;
   #endregion
 
   #region Unity Callbacks
   // Use this for initialization
   private void Start () {
     _renderer = GetComponent<Renderer>();
+    _collider = GetComponent<Collider>();
   }
 
   // Update is called once per frame
@@ -23,6 +25,7 @@ public class PickableItem : MonoBehaviour {
     Debug.Log(string.Format("{0} picked by {1}", transform.name, grabber.name));
     transform.parent = grabber;
     _renderer.enabled = false;
+    _collider.enabled = false;
   }
   #endregion
 }
