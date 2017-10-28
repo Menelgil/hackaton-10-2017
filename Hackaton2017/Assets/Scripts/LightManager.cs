@@ -4,7 +4,12 @@ using UnityEngine;
 using System.Linq;
 
 public class LightManager : MonoBehaviour {
+  private Light[] _lightLights;
+  private Light[] _darkLights;
+
   void Start () {
+    this._darkLights = this.GetDarkLights();
+    this._lightLights = this.GetLightLights();
   }
 
   void Update () {
@@ -23,23 +28,19 @@ public class LightManager : MonoBehaviour {
   }
 
   void SwitchLightsOff() {
-    var lightLights = GetLightLights();
-    var darkLights = GetDarkLights();
-    foreach (var light in lightLights) {
+    foreach (var light in this._lightLights) {
       light.enabled = false;
     }
-    foreach (var light in darkLights) {
+    foreach (var light in this._darkLights) {
       light.enabled = true;
     }
   }
 
   void SwitchLightsOn() {
-    var lightLights = GetLightLights();
-    var darkLights = GetDarkLights();
-    foreach (var light in lightLights) {
+    foreach (var light in this._lightLights) {
       light.enabled = true;
     }
-    foreach (var light in darkLights) {
+    foreach (var light in this._darkLights) {
       light.enabled = false;
     }
   }
