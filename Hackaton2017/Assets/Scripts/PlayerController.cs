@@ -6,11 +6,13 @@ public class PlayerController : MonoBehaviour
 {
   public float WalkSpeed;
 
-  private Vector3 ? _targetPosition;
+  private Inventory inventory;
+  private Vector3? _targetPosition;
 
   // Use this for initialization
   void Start() {
     _targetPosition = null;
+    inventory = GetComponent<Inventory>();
   }
 
   // Update is called once per frame
