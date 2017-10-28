@@ -2,32 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
-{
+public class PlayerController : MonoBehaviour {
+  #region Public Properties
   public float WalkSpeed;
+  public float InteractingDistance;
+  #endregion
 
-  private Inventory inventory;
+  #region Private Members
+  private Inventory _inventory;
   private Vector3? _targetPosition;
+  #endregion
 
+  #region Unity Callbacks
   // Use this for initialization
-  void Start() {
+  private void Start() {
     _targetPosition = null;
-    inventory = GetComponent<Inventory>();
+    _inventory = GetComponent<Inventory>();
   }
 
   // Update is called once per frame
-  void Update() {
+  private void Update() {
     if (Input.GetMouseButtonDown(0)) {
       RaycastHit hit;
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
       if (Physics.Raycast(ray, out hit, 100.0f)) {
-        Debug.Log("Clicked on " + hit.transform.name);
+        float distance = (hit.point - transform.position).magnitude;
+        Debug.Log(string.Format("Clicked on {0} @{1}m (in interaction distance: {2})", hit.transform.name, distance, distance < InteractingDistance));
 
-        Debug.Log("Interraction not possible: moving...");
-        MoveTo(hit.point);
+        if (distance > InteractingDistance) {
+          Debug.Log("Too far to interact, moving...");
+          MoveTo(hit.point);
+        } else {
+          PickableItem pickable = hit.collider.GetComponent<PickableItem>();
+          if (pickable != null) {
+            PickItem(pickable);
+          }
+          else {
+            Debug.Log("No interaction, moving...");
+            MoveTo(hit.point);
+          }
+        }
       }
     }
 
+    UpdateMovement();
+  }
+
+  private void OnCollisionEnter(Collision collision) {
+    _targetPosition = null;
+  }
+  #endregion
+
+  #region Private Methods
+  private void UpdateMovement() {
     if (_targetPosition.HasValue) {
       transform.position = Vector3.MoveTowards(transform.position, _targetPosition.Value, Time.deltaTime * WalkSpeed);
       if ((_targetPosition.Value - transform.position).magnitude < .1f) {
@@ -37,12 +64,12 @@ public class PlayerController : MonoBehaviour
     }
   }
 
-  public void OnCollisionEnter(Collision collision) {
-    _targetPosition = null;
-  }
-
-  private void PickItem() {
-
+  private void PickItem(PickableItem item) {
+    if (_inventory.GrabItem(item)) { // we picked-up the item
+      item.PickedBy(this.transform);
+    } else { // we already carry something
+      // TODO: UI to show the user we cannot grab another item
+    }
   }
 
   private void InteractWithItem() {
@@ -62,4 +89,5 @@ public class PlayerController : MonoBehaviour
     target.y = transform.position.y;
     _targetPosition = target;
   }
+  #endregion
 }

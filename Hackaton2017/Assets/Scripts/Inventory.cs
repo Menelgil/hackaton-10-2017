@@ -3,27 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour {
-  private PickableItem item;
+  #region Private Members
+  private PickableItem _item;
+  #endregion
 
+  #region Unity Callbacks
   // Use this for initialization
-  void Start () {
-    this.item = null;
+  private void Start () {
+    this._item = null;
   }
   
   // Update is called once per frame
-  void Update () {
+  private void Update () {
   }
+  #endregion
 
-  bool GrabItem(PickableItem item) {
-    if (!this.item)
+  #region Public Interface
+  public bool GrabItem(PickableItem item) {
+    if (this._item != null)
       return false;
-    this.item = item;
+    this._item = item;
     return true;
   }
 
-  PickableItem Release() {
-    var item = this.item;
-    this.item = null;
+  public PickableItem Release() {
+    var item = this._item;
+    this._item = null;
     return item;
   }
+  #endregion
 }
