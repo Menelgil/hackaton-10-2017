@@ -7,14 +7,18 @@ public class Inventory : MonoBehaviour {
   private PickableItem _item;
   #endregion
 
+  #region Public Properties
+  public bool IsEmpty {
+    get {
+      return _item == null;
+    }
+  }
+  #endregion
+
   #region Unity Callbacks
   // Use this for initialization
   private void Start () {
     this._item = null;
-  }
-  
-  // Update is called once per frame
-  private void Update () {
   }
   #endregion
 

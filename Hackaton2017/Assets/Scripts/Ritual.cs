@@ -20,22 +20,6 @@ public class Ritual : InteractibleItem {
 	}
   #endregion
 
-  #region Private Methods
-  private int NextStep() {
-    if (this.Countdown > 0)
-      this.Countdown -= 1;
-    this._renderer.material = this.Materials[this.Countdown];
-    return this.Countdown;
-  }
-
-  private int PreviousStep() {
-    if (this.Countdown < 5)
-      this.Countdown += 1;
-    this._renderer.material = this.Materials[this.Countdown];
-    return this.Countdown;
-  }
-  #endregion
-
   #region Public Interface
   public override void InteractWith(PlayerController player) {
     Inventory inv = player.GetComponent<Inventory>();
@@ -47,10 +31,26 @@ public class Ritual : InteractibleItem {
       Debug.LogFormat("This {0} is useless for the ritual.", carriedItem.name);
     } else {
       questItem.transform.parent = this.transform;
+      GameObject.Destroy(questItem);
+
       if (NextStep() == 0) {
         Debug.LogWarning("WE HAVE A WINNER");
       }
     }
+  }
+
+  public int NextStep() {
+    if (this.Countdown > 0)
+      this.Countdown -= 1;
+    this._renderer.material = this.Materials[this.Countdown];
+    return this.Countdown;
+  }
+
+  public int PreviousStep() {
+    if (this.Countdown < 5)
+      this.Countdown += 1;
+    this._renderer.material = this.Materials[this.Countdown];
+    return this.Countdown;
   }
   #endregion
 }

@@ -14,6 +14,7 @@ public class LightManager : MonoBehaviour {
   #region Public Properties
   public float LightCycleDuration;
   public float Leeway;
+  public MonsterController Monster;
   #endregion
 
   #region Unity Callbacks
@@ -58,6 +59,7 @@ public class LightManager : MonoBehaviour {
       light.enabled = true;
     }
     _lightsOn = false;
+    Monster.WakeUp();
   }
 
   public void SwitchLightsOn() {
@@ -70,6 +72,7 @@ public class LightManager : MonoBehaviour {
     if (!_lightsOn) {
       _lightsOn = true;
       _remainingLightCycleTime = Random.Range(LightCycleDuration - Leeway, LightCycleDuration + Leeway);
+      Monster.Sleep();
       Debug.LogWarningFormat("New light cycle: {0}s", _remainingLightCycleTime);
     }
   }

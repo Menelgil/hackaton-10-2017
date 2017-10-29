@@ -3,32 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : EntityController {
   #region Public Properties
-  public float WalkSpeed;
   public float InteractingDistance;
   #endregion
 
   #region Private Members
   private Inventory _inventory;
-  private Vector3? _targetPosition;
-  private float _targetEpsilon;
-  private Action _targetReached;
-
-  private const float DefaultEpsilon = .1f;
   #endregion
 
   #region Unity Callbacks
   // Use this for initialization
-  private void Start() {
-    _targetPosition = null;
-    _targetReached = null;
-    _targetEpsilon = DefaultEpsilon;
+  protected override void Start() {
+    base.Start();
     _inventory = GetComponent<Inventory>();
   }
 
   // Update is called once per frame
-  private void Update() {
+  protected override void Update() {
     if (Input.GetButton("Fire1")) {
       RaycastHit hit;
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -53,30 +45,11 @@ public class PlayerController : MonoBehaviour {
       }
     }
 
-    UpdateMovement();
-  }
-
-  private void OnCollisionEnter(Collision collision) {
-    _targetPosition = null;
+    base.Update();
   }
   #endregion
 
   #region Private Methods
-  private void UpdateMovement() {
-    if (_targetPosition.HasValue) {
-      transform.position = Vector3.MoveTowards(transform.position, _targetPosition.Value, Time.deltaTime * WalkSpeed);
-
-      float remainingDistance = (_targetPosition.Value - transform.position).magnitude;
-      if (remainingDistance < _targetEpsilon) {
-        if (_targetReached != null) {
-          _targetReached();
-        }
-        _targetReached = null;
-        _targetPosition = null;
-      }
-    }
-  }
-
   private void PickItem(PickableItem item) {
     if (!item.IsPickable) {
       // we don't know what the item will be used for
@@ -92,23 +65,6 @@ public class PlayerController : MonoBehaviour {
 
   private void InteractWithItem(InteractibleItem item) {
     item.InteractWith(this);
-  }
-
-  private void MoveTo(Vector3 target, float reach = DefaultEpsilon, Action andThen = null) {
-    Vector3 targetPos = target;
-    targetPos.y = transform.position.y;
-    _targetPosition = targetPos;
-    _targetEpsilon = reach;
-    _targetReached = andThen;
-  }
-
-  private void RotateTo(Vector3 target) {
-    Vector3 direction = target - transform.position;
-    direction.y = 0;
-    if (direction.magnitude > 1) {
-      direction.Normalize();
-    }
-    transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
   }
   #endregion
 }
