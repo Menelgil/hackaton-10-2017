@@ -16,6 +16,9 @@ public class LightManager : MonoBehaviour {
   }
 
   private void Update () {
+    if (Input.GetMouseButtonDown(1)) {
+      SwitchLightsOff();
+    }
   }
   #endregion
 
