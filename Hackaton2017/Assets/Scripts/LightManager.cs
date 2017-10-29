@@ -7,17 +7,30 @@ public class LightManager : MonoBehaviour {
   #region Private Members
   private Light[] _lightLights;
   private Light[] _darkLights;
+  private float _remainingLightCycleTime;
+  private bool _lightsOn;
+  #endregion
+
+  #region Public Properties
+  public float LightCycleDuration;
+  public float Leeway;
   #endregion
 
   #region Unity Callbacks
   private void Start () {
+    _lightsOn = false;
     this._darkLights = this.GetDarkLights();
     this._lightLights = this.GetLightLights();
+    SwitchLightsOn();
   }
 
-  private void Update () {
-    if (Input.GetMouseButtonDown(1)) {
-      SwitchLightsOff();
+  private void Update() {
+    if (_lightsOn) {
+      _remainingLightCycleTime -= Time.deltaTime;
+
+      if (_remainingLightCycleTime <= 0) {
+        SwitchLightsOff();
+      }
     }
   }
   #endregion
@@ -44,6 +57,7 @@ public class LightManager : MonoBehaviour {
     foreach (var light in this._darkLights) {
       light.enabled = true;
     }
+    _lightsOn = false;
   }
 
   public void SwitchLightsOn() {
@@ -52,6 +66,11 @@ public class LightManager : MonoBehaviour {
     }
     foreach (var light in this._darkLights) {
       light.enabled = false;
+    }
+    if (!_lightsOn) {
+      _lightsOn = true;
+      _remainingLightCycleTime = Random.Range(LightCycleDuration - Leeway, LightCycleDuration + Leeway);
+      Debug.LogWarningFormat("New light cycle: {0}s", _remainingLightCycleTime);
     }
   }
   #endregion

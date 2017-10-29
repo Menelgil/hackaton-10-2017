@@ -930,3 +930,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WalkSpeed: 3
+  InteractingDistance: 1

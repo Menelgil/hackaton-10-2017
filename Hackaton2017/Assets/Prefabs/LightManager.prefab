@@ -51,3 +51,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644baba3eeafa4875b7debad22a13742, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LightCycleDuration: 5
+  Leeway: 2.5
