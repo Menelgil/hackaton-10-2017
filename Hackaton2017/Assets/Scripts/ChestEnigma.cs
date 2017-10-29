@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChestEnigma : InteractibleItem {
+public class ChestEnigma : LockedInteractibleItem {
   #region Public Properties
   public PickableItem QuestItem;
   #endregion

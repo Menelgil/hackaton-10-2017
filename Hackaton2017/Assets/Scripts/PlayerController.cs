@@ -30,10 +30,9 @@ public class PlayerController : MonoBehaviour {
   // Update is called once per frame
   private void Update() {
     if (Input.GetButton("Fire1")) {
-    //if (Input.GetMouseButtonDown(0)) {
       RaycastHit hit;
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-      if (Physics.Raycast(ray, out hit, 100.0f)) {
+      if (Physics.Raycast(ray, out hit, 100)) {
         PickableItem pickable = hit.collider.GetComponent<PickableItem>();
         InteractibleItem interactible = hit.collider.GetComponent<InteractibleItem>();
 
