@@ -16,6 +16,7 @@ public class ChestEnigma : InteractibleItem {
     inventory.GrabItem(questItem);
 
     _isInteractionEnabled = false;
+    Debug.LogFormat("Nice! I can use this {0} to prepare the exorcism ritual!", questItem.name);
   }
   #endregion
 }

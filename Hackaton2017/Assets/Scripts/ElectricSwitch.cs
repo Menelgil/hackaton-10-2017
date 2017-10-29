@@ -7,6 +7,13 @@ public class ElectricSwitch : InteractibleItem {
   public LightManager LightManager;
   #endregion
 
+  #region Unity Callbacks
+  private void Start() {
+    _firstInteraction = false;
+    _isInteractionEnabled = true;
+  }
+  #endregion
+
   #region Specialized Behavior
   protected override void DoInteraction(PlayerController player, Inventory inventory, PickableItem key) {
     LightManager.SwitchLightsOn();

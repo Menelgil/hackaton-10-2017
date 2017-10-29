@@ -33,11 +33,9 @@ public class PlayerController : MonoBehaviour {
       RaycastHit hit;
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
       if (Physics.Raycast(ray, out hit, 100.0f)) {
-        float distance = (hit.point - transform.position).magnitude;
-        Debug.Log(string.Format("Clicked on {0} @{1}m (in interaction distance: {2})", hit.transform.name, distance, distance < InteractingDistance));
-
         PickableItem pickable = hit.collider.GetComponent<PickableItem>();
         InteractibleItem interactible = hit.collider.GetComponent<InteractibleItem>();
+
         if (pickable != null) {
           RotateTo(pickable.transform.position);
           MoveTo(target: pickable.transform.position, reach: InteractingDistance, andThen: () => {
@@ -49,7 +47,6 @@ public class PlayerController : MonoBehaviour {
             InteractWithItem(interactible);
           });
         } else {
-          Debug.Log("No interaction, moving...");
           RotateTo(hit.point);
           MoveTo(target: hit.point);
         }
@@ -81,29 +78,20 @@ public class PlayerController : MonoBehaviour {
   }
 
   private void PickItem(PickableItem item) {
-    if (_inventory.GrabItem(item)) { // we picked-up the item
+    if (!item.IsPickable) {
+      // we don't know what the item will be used for
+      Debug.Log("This will probably be usefull later.");
+    } else if (!_inventory.GrabItem(item)) {
+      // we already carry something
+      Debug.Log("My hands are full, I can't pick this up.");
+    } else {
       item.PickedBy(this.transform);
-    } else { // we already carry something
-      Debug.Log("We are already carrying something");
-      // TODO: UI to show the user we cannot grab another item
+      Debug.LogFormat("I might need this.");
     }
   }
 
   private void InteractWithItem(InteractibleItem item) {
-    switch (item.Interact(this)) {
-      case InteractionResult.Success:
-        return;
-
-      case InteractionResult.MissingKey:
-        Debug.Log("I need something for that");
-        // TODO: UI to show we are missing the required item
-        return;
-
-      case InteractionResult.InvalidKey:
-        Debug.Log("I can't use this to solve that");
-        // TODO: UI to show we are carrying the wrong item
-        return;
-    }
+    item.InteractWith(this);
   }
 
   private void MoveTo(Vector3 target, float reach = DefaultEpsilon, Action andThen = null) {

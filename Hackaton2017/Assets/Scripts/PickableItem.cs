@@ -8,9 +8,14 @@ public class PickableItem : MonoBehaviour {
   private Collider _collider;
   #endregion
 
+  #region Public Properties
+  public bool IsPickable { get; set; }
+  #endregion
+
   #region Unity Callbacks
   // Use this for initialization
   private void Start () {
+    IsPickable = false;
     _renderer = GetComponent<Renderer>();
     _collider = GetComponent<Collider>();
   }
@@ -22,10 +27,11 @@ public class PickableItem : MonoBehaviour {
 
   #region Public Interface
   public void PickedBy(Transform grabber) {
-    Debug.Log(string.Format("{0} picked by {1}", transform.name, grabber.name));
-    transform.parent = grabber;
-    _renderer.enabled = false;
-    _collider.enabled = false;
+    if (IsPickable) {
+      transform.parent = grabber;
+      _renderer.enabled = false;
+      _collider.enabled = false;
+    }
   }
   #endregion
 }

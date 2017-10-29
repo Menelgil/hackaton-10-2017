@@ -11,6 +11,7 @@ public enum InteractionResult {
 public abstract class InteractibleItem : MonoBehaviour {
   #region Protected Members
   protected bool _isInteractionEnabled;
+  protected bool _firstInteraction;
   #endregion
 
   #region Public Properties
@@ -20,7 +21,8 @@ public abstract class InteractibleItem : MonoBehaviour {
   #region Unity Callbacks
   // Use this for initialization
   private void Start () {
-    _isInteractionEnabled = true;
+    _firstInteraction = true;
+    _isInteractionEnabled = false;
 	}
 	
 	// Update is called once per frame
@@ -33,29 +35,36 @@ public abstract class InteractibleItem : MonoBehaviour {
   #endregion
 
   #region Public Interface
-  public InteractionResult Interact(PlayerController player) {
-    if (_isInteractionEnabled) {
+  public void InteractWith(PlayerController player) {
+    if (_firstInteraction) {
+      _firstInteraction = false;
+      _isInteractionEnabled = true;
+      
+      if (ExpectedKey != null) {
+        ExpectedKey.IsPickable = true;
+        Debug.LogFormat("I need a {0} to use this {1}", ExpectedKey.name, this.name);
+      }
+    }
+    else if (_isInteractionEnabled) {
       Inventory inv = player.GetComponent<Inventory>();
 
       if (ExpectedKey == null) {
         DoInteraction(player, inv, null);
-        return InteractionResult.Success;
       }
       else {
         PickableItem key = inv.ReleaseItem();
-        if (key == null) {
-          return InteractionResult.MissingKey;
+        if (key == null) { // no key provided
+          Debug.LogFormat("I need a {0} to use this {1}", ExpectedKey.name, this.name);
         }
-        else if (ExpectedKey.GetInstanceID() != key.GetInstanceID()) {
+        else if (ExpectedKey.GetInstanceID() != key.GetInstanceID()) { // invalid key
           inv.GrabItem(key);
-          return InteractionResult.InvalidKey;
+          Debug.LogFormat("I can't use a {0} with this {1}", key.name, this.name);
         }
-
-        DoInteraction(player, inv, key);
-        return InteractionResult.Success;
+        else {
+          DoInteraction(player, inv, key);
+        }
       }
     }
-    return InteractionResult.Success;
   }
   #endregion
 }
