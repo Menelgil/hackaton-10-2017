@@ -9,6 +9,10 @@ public enum InteractionResult {
 }
 
 public abstract class InteractibleItem : MonoBehaviour {
+  #region Protected Members
+  protected bool _isInteractionEnabled;
+  #endregion
+
   #region Public Properties
   public PickableItem ExpectedKey;
   #endregion
@@ -16,6 +20,7 @@ public abstract class InteractibleItem : MonoBehaviour {
   #region Unity Callbacks
   // Use this for initialization
   private void Start () {
+    _isInteractionEnabled = true;
 	}
 	
 	// Update is called once per frame
@@ -24,18 +29,32 @@ public abstract class InteractibleItem : MonoBehaviour {
   #endregion
 
   #region Specialized Behavior
-  protected abstract void DoInteraction();
+  protected abstract void DoInteraction(PlayerController player, Inventory inventory, PickableItem key);
   #endregion
 
   #region Public Interface
-  public InteractionResult Interact(PickableItem key) {
-    if (ExpectedKey != null && key == null) {
-      return InteractionResult.MissingKey;
-    } else if (ExpectedKey != null && key != null && ExpectedKey.GetInstanceID() != key.GetInstanceID()) {
-      return InteractionResult.InvalidKey;
-    }
+  public InteractionResult Interact(PlayerController player) {
+    if (_isInteractionEnabled) {
+      Inventory inv = player.GetComponent<Inventory>();
 
-    DoInteraction();
+      if (ExpectedKey == null) {
+        DoInteraction(player, inv, null);
+        return InteractionResult.Success;
+      }
+      else {
+        PickableItem key = inv.ReleaseItem();
+        if (key == null) {
+          return InteractionResult.MissingKey;
+        }
+        else if (ExpectedKey.GetInstanceID() != key.GetInstanceID()) {
+          inv.GrabItem(key);
+          return InteractionResult.InvalidKey;
+        }
+
+        DoInteraction(player, inv, key);
+        return InteractionResult.Success;
+      }
+    }
     return InteractionResult.Success;
   }
   #endregion

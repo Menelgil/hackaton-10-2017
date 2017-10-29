@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enigma : InteractibleItem {
+public class QuestItem : PickableItem {
   #region Unity Callbacks
   // Use this for initialization
   private void Start () {
@@ -11,10 +11,5 @@ public class Enigma : InteractibleItem {
 	// Update is called once per frame
 	private void Update () {
 	}
-  #endregion
-
-  #region Specialized Behavior
-  protected override void DoInteraction() {
-  }
   #endregion
 }

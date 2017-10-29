@@ -7,18 +7,8 @@ public class ElectricSwitch : InteractibleItem {
   public LightManager LightManager;
   #endregion
 
-  #region Unity Callbacks
-  // Use this for initialization
-  private void Start () {
-	}
-	
-	// Update is called once per frame
-	private void Update () {
-	}
-  #endregion
-
   #region Specialized Behavior
-  protected override void DoInteraction() {
+  protected override void DoInteraction(PlayerController player, Inventory inventory, PickableItem key) {
     LightManager.SwitchLightsOn();
   }
   #endregion

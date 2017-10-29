@@ -90,23 +90,19 @@ public class PlayerController : MonoBehaviour {
   }
 
   private void InteractWithItem(InteractibleItem item) {
-    PickableItem pickedItem = _inventory.ReleaseItem();
-    InteractionResult interactionResult = item.Interact(pickedItem);
-
-    switch (interactionResult) {
+    switch (item.Interact(this)) {
       case InteractionResult.Success:
-        GameObject.Destroy(pickedItem);
-        break;
+        return;
 
       case InteractionResult.MissingKey:
         Debug.Log("I need something for that");
-        // TODO: UI to show we are missing the required item to interact
-        break;
+        // TODO: UI to show we are missing the required item
+        return;
 
       case InteractionResult.InvalidKey:
         Debug.Log("I can't use this to solve that");
-        // TODO: UI to show we are carrying the wrong item to interact
-        break;
+        // TODO: UI to show we are carrying the wrong item
+        return;
     }
   }
 
