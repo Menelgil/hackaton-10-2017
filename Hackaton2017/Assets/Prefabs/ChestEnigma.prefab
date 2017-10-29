@@ -108,5 +108,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ExpectedKey: {fileID: 0}
-  QuestItemPrefab: {fileID: 114166869764785896, guid: 3ebe5e26eac5986499ed725b18dcc835,
-    type: 2}
+  QuestItemPrefab: {fileID: 0}

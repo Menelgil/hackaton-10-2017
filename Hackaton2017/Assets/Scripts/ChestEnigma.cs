@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChestEnigma : InteractibleItem {
   #region Public Properties
-  public PickableItem QuestItemPrefab;
+  public PickableItem QuestItem;
   #endregion
 
   #region Specialized Behavior
@@ -12,11 +12,11 @@ public class ChestEnigma : InteractibleItem {
     key.transform.parent = this.transform;
     GameObject.Destroy(key);
 
-    PickableItem questItem = Instantiate(QuestItemPrefab, player.transform);
-    inventory.GrabItem(questItem);
+    QuestItem.transform.parent = player.transform;
+    inventory.GrabItem(QuestItem);
 
     _isInteractionEnabled = false;
-    Debug.LogFormat("Nice! I can use this {0} to prepare the exorcism ritual!", questItem.name);
+    Debug.LogFormat("Nice! I can use this {0} to prepare the exorcism ritual!", QuestItem.name);
   }
   #endregion
 }
